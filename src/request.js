@@ -130,8 +130,7 @@
                 getMethodParamRequestString(requestParams, paramKey, callParams)
             );
         }
-
-        return getParamAsString(callParams.method, responseArray.join(''), null, callParams.attributes);
+        return getParamAsString(callParams.method, responseArray.join(''), opts, callParams.attributes);
     }
 
     function getRequestEnvelopeParams (params, opts) {
@@ -158,8 +157,8 @@
                 var xsd = _.findWhere(namespaces, { 'short': 'xsd' }) || {};
 
                 return {
-                    'soap_env'  : 'http://schemas.xmlsoap.org/soap/envelope/',
-                    'xml_schema': xsd.full || 'http://www.w3.org/2001/XMLSchema',
+                    'soap_env'  : 'http://www.w3.org/2003/05/soap-envelope',
+                    'xml_schema': xsd.full || 'http://www.w3.org/2001/XMLSchema-instance',
                     'namespaces': namespaces
                 };
             });
@@ -206,15 +205,15 @@
         const $namespaces = envelope.namespaces.map((namespace) => `xmlns:${namespace.short}="${namespace.full}"`);
         const $namespacesAsString = $namespaces.join(' ');
 
-        const $head = (head !== null) ? `<SOAP-ENV:Header>${head.join('')}</SOAP-ENV:Header>` : '';
-        const $body = `<SOAP-ENV:Body>${body}</SOAP-ENV:Body>`;
+        const $head = (head !== null) ? `<soap:Header>${head.join('')}</soap:Header>` : '';
+        const $body = `<soap:Body>${body}</soap:Body>`;
 
-        const $soapEnvelope = `<SOAP-ENV:Envelope
-            xmlns:SOAP-ENV="${envelope.soap_env}"
+        const $soapEnvelope = `<soap:Envelope
+            xmlns:soap="${envelope.soap_env}"
             ${$namespacesAsString}>
             ${$head}
             ${$body}
-        </SOAP-ENV:Envelope>`;
+        </soap:Envelope>`;
 
         return `<?xml version="1.0" encoding="UTF-8"?>${$soapEnvelope}`;
     };
